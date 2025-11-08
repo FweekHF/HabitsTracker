@@ -3,8 +3,8 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './icon.png',
+  './icon.png'
 ];
 
 // Instalar SW y guardar archivos en caché
