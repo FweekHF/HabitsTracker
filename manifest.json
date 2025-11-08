@@ -1,21 +1,13 @@
 {
-  "name": "Plan CMI Fweek",
-  "short_name": "CMI Plan",
-  "start_url": "./index.html",
+  "name": "Plan CMI — Ingeniería en Informática Militar",
+  "short_name": "Plan CMI",
+  "start_url": "/plan-cmi-pwa/index.html",
   "display": "standalone",
-  "background_color": "#0ea5e9",
-  "theme_color": "#0ea5e9",
+  "background_color": "#1c1f1b",
+  "theme_color": "#63744c",
+  "description": "PWA de entrenamiento, estudio y disciplina para aspirantes al Colegio Militar de Ingenieros.",
   "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
-
