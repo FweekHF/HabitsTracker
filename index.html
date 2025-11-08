@@ -3,43 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Plan CMI — Dashboard Completo</title>
-  <meta name="theme-color" content="#0ea5e9" />
+  <title>Plan CMI — Dashboard Militar</title>
+  <meta name="theme-color" content="#63744c" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;
-      --line:#e2e8f0;--brand:#0ea5e9;--brand2:#0369a1;
-      --ok:#10b981;--warn:#f59e0b;--bad:#ef4444;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      background:var(--bg);color:var(--fg);line-height:1.55}
-    header{background:linear-gradient(135deg,var(--brand),var(--brand2));
-      color:#fff;padding:24px;text-align:center;border-radius:0 0 16px 16px}
-    h1{margin:0;font-size:clamp(1.5rem,2.2vw + .8rem,2.4rem)}
-    .container{max-width:1100px;margin:auto;padding:16px}
-    .card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:16px;
-      border:1px solid var(--line);box-shadow:0 1px 3px rgba(2,6,23,.05),0 8px 24px rgba(2,6,23,.06)}
-    .card h2{margin-top:0}
-    .btn{background:var(--brand);border:none;border-radius:8px;color:#fff;
-      padding:8px 12px;font-weight:600;cursor:pointer;margin:4px}
-    .btn.ghost{background:#e2e8f0;color:#0f172a}
-    .progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:6px}
-    .bar{height:100%;background:linear-gradient(90deg,#22c55e,#0ea5e9);width:0%}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{padding:8px;border-bottom:1px solid #e2e8f0;text-align:left}
-    th{background:#f1f5f9}
-    canvas{width:100%!important;max-height:300px}
-    .small{font-size:.9rem;color:var(--muted)}
-  </style>
 </head>
 <body>
   <header>
-    <h1>Plan Integral CMI — Dashboard de Progreso</h1>
-    <p>Candidato: <strong>Fweek</strong> | Ingeniería en Informática Militar</p>
+    <h1>Plan Integral CMI — Físico, Académico y Mental</h1>
+    <p>Preparación de <strong>Fweek</strong> | Ingeniería en Informática Militar</p>
   </header>
 
   <div class="container">
@@ -85,10 +59,12 @@
       <button id="resetMental" class="btn">Reiniciar hábitos</button>
 
       <h3>Reflexión diaria</h3>
-      <textarea id="notaMental" rows="3" style="width:100%;border:1px solid #e2e8f0;border-radius:10px;padding:8px"></textarea>
+      <textarea id="notaMental" rows="3" placeholder="¿Qué aprendiste o cómo te sentiste hoy?"></textarea>
       <button id="saveNotaMental" class="btn">Guardar reflexión</button>
       <canvas id="chartMental"></canvas>
     </div>
+
+    <footer>© 2025 Plan CMI | Desarrollado por Said 🪖</footer>
   </div>
 
   <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -101,41 +77,38 @@
     progreso:"++id,tipo,valor,fecha",
     notas:"++id,fecha,texto"
   });
+
   const $=s=>document.querySelector(s);
   const hoy=new Date().toISOString().slice(0,10);
 
-  // Render genérico
-  async function renderList(nombre,el){
-    const data=await db[nombre].toArray();el.innerHTML="";
+  async function renderList(tabla,el){
+    const data=await db[tabla].toArray();
+    el.innerHTML="";
     data.forEach(d=>{
       const li=document.createElement("li");
       li.innerHTML=`<input type="checkbox" ${d.completado?'checked':''}> <input type="text" value="${d.tarea}">`;
-      li.querySelector("input[type=checkbox]").onchange=e=>db[nombre].update(d.id,{completado:e.target.checked});
-      li.querySelector("input[type=text]").onchange=e=>db[nombre].update(d.id,{tarea:e.target.value});
+      li.querySelector("input[type=checkbox]").onchange=e=>db[tabla].update(d.id,{completado:e.target.checked});
+      li.querySelector("input[type=text]").onchange=e=>db[tabla].update(d.id,{tarea:e.target.value});
       el.appendChild(li);
     });
   }
-  function addTask(tabla,texto){return db[tabla].add({tarea:texto,completado:false});}
 
-  // Físico
-  async function renderFisico(){renderList("fisico",$("#fisico"));}
-  $("#addFisico").onclick=()=>addTask("fisico","Nueva tarea").then(renderFisico);
-  $("#resetFisico").onclick=()=>db.fisico.clear().then(renderFisico);
-  renderFisico();
+  const addTask=(t,texto)=>db[t].add({tarea:texto,completado:false});
 
-  // Académico
-  async function renderAcademico(){renderList("academico",$("#academico"));}
-  $("#addAcademico").onclick=()=>addTask("academico","Nuevo tema").then(renderAcademico);
-  $("#clearAcademico").onclick=()=>db.academico.where("completado").equals(1).delete().then(renderAcademico);
-  renderAcademico();
+  async function renderAll(){
+    renderList("fisico",$("#fisico"));
+    renderList("academico",$("#academico"));
+    renderList("mental",$("#mental"));
+  }
+  renderAll();
 
-  // Mental
-  async function renderMental(){renderList("mental",$("#mental"));}
-  $("#addMental").onclick=()=>addTask("mental","Nuevo hábito").then(renderMental);
-  $("#resetMental").onclick=()=>db.mental.clear().then(renderMental);
-  renderMental();
+  $("#addFisico").onclick=()=>addTask("fisico","Nueva tarea").then(renderAll);
+  $("#resetFisico").onclick=()=>db.fisico.clear().then(renderAll);
+  $("#addAcademico").onclick=()=>addTask("academico","Nuevo tema").then(renderAll);
+  $("#clearAcademico").onclick=()=>db.academico.where("completado").equals(1).delete().then(renderAll);
+  $("#addMental").onclick=()=>addTask("mental","Nuevo hábito").then(renderAll);
+  $("#resetMental").onclick=()=>db.mental.clear().then(renderAll);
 
-  // Trackers
   function pct(val,meta,inverse=false){if(inverse)return Math.max(0,Math.min(1,(15-val)/(15-9.75)));return Math.max(0,Math.min(1,val/meta));}
   function updateFisico(){
     const km=parseFloat($("#km").value)||13;
@@ -166,7 +139,6 @@
     $("#notaMental").value="";renderCharts();
   };
 
-  // === DASHBOARD CHARTS ===
   let chartFisico,chartAcademico,chartMental;
   async function renderCharts(){
     const datos=await db.progreso.toArray();
@@ -188,26 +160,24 @@
     if(chartFisico)chartFisico.destroy();
     chartFisico=new Chart($("#chartFisico"),{
       type:"line",
-      data:{labels:fechas,datasets:[{label:"Progreso físico (%)",data:fisico,borderColor:"#0ea5e9",tension:.3}]},
+      data:{labels:fechas,datasets:[{label:"Progreso físico (%)",data:fisico,borderColor:"#b89f5d",backgroundColor:"rgba(184,159,93,.2)",tension:.3}]},
       options:{scales:{y:{beginAtZero:true,max:100}}}
     });
     if(chartAcademico)chartAcademico.destroy();
     chartAcademico=new Chart($("#chartAcademico"),{
       type:"bar",
-      data:{labels:fechas,datasets:[{label:"Horas de estudio",data:academico,backgroundColor:"#10b981"}]},
+      data:{labels:fechas,datasets:[{label:"Horas de estudio",data:academico,backgroundColor:"#8ba870"}]},
       options:{scales:{y:{beginAtZero:true,max:100}}}
     });
     if(chartMental)chartMental.destroy();
     chartMental=new Chart($("#chartMental"),{
       type:"line",
-      data:{labels:fechas,datasets:[{label:"Días con reflexión registrada",data:mental,borderColor:"#f59e0b"}]},
+      data:{labels:fechas,datasets:[{label:"Días con reflexión registrada",data:mental,borderColor:"#f2c94c",backgroundColor:"rgba(242,201,76,.2)",tension:.3}]},
       options:{scales:{y:{beginAtZero:true,max:100}}}
     });
   }
   renderCharts();
-
   if("serviceWorker" in navigator){navigator.serviceWorker.register("service-worker.js");}
   </script>
 </body>
 </html>
-
